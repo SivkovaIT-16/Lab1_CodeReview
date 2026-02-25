@@ -7,7 +7,7 @@
 #include <cmath>
 
 // FIX_ME: using namespace std в глобальной области видимости
-//using namespace std
+//using namespace std;
 
 //FIX_ME: фигурная скобка должна быть на новой строке
 //int main() {
