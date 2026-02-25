@@ -29,9 +29,9 @@ int ParseNumber(const std::string& Text)
     //if (s[0] == '(' && s[s.length() - 1] == ')') {
     if (Text[0] == '(' && Text[Text.length() - 1] == ')')
     {
-        // FIX_ME: имя функции и имя параметра обновлены
+        // FIX_ME: имя параметра обновлено
         //return Calc(s.substr(1, s.length() - 2));
-        return CalculateExpression(Text.substr(1, Text.length() - 2));
+        return Calc(Text.substr(1, Text.length() - 2));
     }
     // FIX_ME: фигурная скобка должна быть на новой строке
     //else {
@@ -108,7 +108,7 @@ int ParseTerm(const std::string& Text)
     //return Term(s.substr(0, pos)) * Num(s.substr(pos + 1));
     if (OperatorPosition == -1)
     {
-        return ParseNumber(Text);
+        return ParseNumber(text);
     }
     return ParseTerm(Text.substr(0, OperatorPosition)) *
         ParseNumber(Text.substr(OperatorPosition + 1));
