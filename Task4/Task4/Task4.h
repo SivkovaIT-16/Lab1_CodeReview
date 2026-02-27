@@ -22,3 +22,8 @@ int ParseNumber(const std::string& Text);
 // FIX_ME: добавить std::
 //int Term(string s) {
 int ParseTerm(const std::string& Text);
+
+// FIX_ME: добавить функции проверки ввода
+bool IsValidExpression(const std::string& Expression);
+bool IsBalancedParentheses(const std::string& Expression);
+bool HasValidCharacters(const std::string& Expression);

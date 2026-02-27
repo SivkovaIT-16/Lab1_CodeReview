@@ -9,6 +9,9 @@
 //вывести единственное число : минимальную сумму, а во второй строке вывести путь в виде
 //строки символов, обозначив символом L движение влево, а символом D - движение вниз.
 
+// FIX_ME: программа должна быть разделена на модули (заголовочный файл .h и файл реализации .cpp)
+
+#include "Task2.h"
 #include <iostream> 
 #include <fstream>  
 #include <vector>    
@@ -22,8 +25,9 @@
 int main()
 {
     // FIX_ME: добавлена поддержка русского языка
-    setlocale(0, "");
+    setlocale(LC_ALL, "Russian");
 
+    // FIX_ME: добавлена проверка открытия файлов с использованием функций
     // FIX_ME: имена переменных должны начинаться с заглавной буквы
     // FIX_ME: добавить std::
     //ifstream inputFile("input1.txt");
@@ -32,61 +36,65 @@ int main()
     std::ofstream OutputFile("output1.txt");
 
     // FIX_ME: фигурная скобка должна быть на новой строке
-    // FIX_ME: обновлено имя переменной
+    // FIX_ME: добавить std:: 
     //if (!inputFile.is_open()) {
+    //    cerr << "Не удалось открыть входной файл!" << endl;
+    //    return 1;
+    //}
     if (!InputFile.is_open())
     {
-        // FIX_ME: добавить std::
-        //cerr << "Не удалось открыть входной файл!" << std::endl;
         std::cerr << "Не удалось открыть входной файл!" << std::endl;
         return 1;
     }
 
+
     // FIX_ME: фигурная скобка должна быть на новой строке
-    // FIX_ME: обновлено имя переменной
+    // FIX_ME: добавить std:: 
     //if (!outputFile.is_open()) {
+    //    cerr << "Не удалось открыть выходной файл!" << endl;
+    //    inputFile.close();
+    //    return 1;
+    //}
     if (!OutputFile.is_open())
     {
-        // FIX_ME: добавить std::
-        //cerr << "Не удалось открыть выходной файл!" << endl;
         std::cerr << "Не удалось открыть выходной файл!" << std::endl;
-        // FIX_ME: обновлено имя переменной
-        //inputFile.close();
         InputFile.close();
         return 1;
     }
 
     // FIX_ME: имя переменной должно начинаться с заглавной буквы
+    // FIX_ME: переменная должна быть инициализирована
     //int n;
     int N = 0;
 
-    // FIX_ME: обновлены имена переменных
+    // FIX_ME: добавлена проверка чтения размера доски 
     //inputFile >> n;
-    InputFile >> N;
+    if (!ReadBoardSize(InputFile, N))
+    {
+        InputFile.close();
+        OutputFile.close();
+        return 1;
+    }
 
     // FIX_ME: имена переменных должны начинаться с заглавной буквы
     // FIX_ME: убрать лишние пробелы в угловых скобках
-    // FIX_ME: обновлены имена переменных
     // FIX_ME: добавить std::
     //vector<vector<int>> board(n, vector<int>(n));
     std::vector<std::vector<int>> Board(N, std::vector<int>(N)); // Создает двумерный вектор (матрицу) board размера n x n для хранения значений доски.
 
-    // FIX_ME: фигурная скобка должна быть на новой строке
-    // FIX_ME: обновлены имена переменных
+    // FIX_ME: добавлена проверка чтения данных доски через функцию
     //for (int i = 0; i < n; ++i) { 
     //    for (int j = 0; j < n; ++j) { 
     //        inputFile >> board[i][j];
     //    }
     //}
-    for (int i = 0; i < N; ++i)
-    { // Цикл по строкам доски.
-        for (int j = 0; j < N; ++j)
-        { // Цикл по столбцам доски.
-            InputFile >> Board[i][j];
-        }
+    if (!ReadBoardData(InputFile, Board, N))
+    {
+        InputFile.close();
+        OutputFile.close();
+        return 1;
     }
 
-    // FIX_ME: обновлено имя переменной
     //inputFile.close();
     InputFile.close();
 
@@ -98,33 +106,33 @@ int main()
     std::vector<std::vector<int>> DP(N, std::vector<int>(N, 0)); // Xранит минимальную сумму неприятностей для достижения клетки (i, j).
     std::vector<std::vector<char>> Path(N, std::vector<char>(N, ' ')); // Path[i][j] хранит символ 'L' (влево) или 'D' (вниз), указывающий, откуда мы пришли в клетку (i, j).
 
-    // FIX_ME: обновлены имена переменных
     //dp[0][n - 1] = board[0][n - 1];
     DP[0][N - 1] = Board[0][N - 1];
 
     // Заполняем первый столбец (движение только вниз):
     // FIX_ME: фигурная скобка должна быть на новой строке
-    // FIX_ME: обновлены имена переменных
     //for (int = 1; i < n; ++i) {
     for (int i = 1; i < N; ++i)
     {
+        //dp[i][n - 1] = dp[i - 1][n - 1] + board[i][n - 1];
+        //path[i][n - 1] = 'D';
         DP[i][N - 1] = DP[i - 1][N - 1] + Board[i][N - 1];
         Path[i][N - 1] = 'D';
     }
 
     // Заполняем первую строку (движение только влево):
     // FIX_ME: фигурная скобка должна быть на новой строке
-    // FIX_ME: обновлены имена переменных
     //for (int j = n - 2; j >= 0; --j) {
     for (int j = N - 2; j >= 0; --j)
     {
+        //dp[0][j] = dp[0][j + 1] + board[0][j]; 
+        //path[0][j] = 'L';
         DP[0][j] = DP[0][j + 1] + Board[0][j];
         Path[0][j] = 'L'; // Записывает 'L' в path, указывая, что мы пришли в эту клетку справа.
     }
 
     // Заполняем оставшуюся часть
     // FIX_ME: фигурная скобка должна быть на новой строке
-    // FIX_ME: обновлены имена переменных
     //for (int i = 1; i < n; ++i) {
     //    for (int j = n - 2; j >= 0; --j) {
     //        if (dp[i - 1][j] < dp[i][j + 1]) {
@@ -141,8 +149,9 @@ int main()
     {
         for (int j = N - 2; j >= 0; --j)
         {
-            if (DP[i - 1][j] < DP[i][j + 1])
-            { // Проверяет, какой путь лучше: сверху или справа.
+
+            if (DP[i - 1][j] < DP[i][j + 1]) // Проверяет, какой путь лучше: сверху или справа.
+            { 
                 DP[i][j] = DP[i - 1][j] + Board[i][j];
                 Path[i][j] = 'D';
             }
@@ -161,7 +170,6 @@ int main()
     std::string Route = "";
 
     // FIX_ME: имена переменных должны начинаться с заглавной буквы
-    // FIX_ME: обновлено имя переменной
     //int row = n - 1;
     //int col = 0;
     int Row = N - 1;
@@ -169,7 +177,6 @@ int main()
 
     // FIX_ME: фигурная скобка должна быть на новой строке
     // // FIX_ME: использовать префиксный инкремент и декремент 
-    // FIX_ME: обновлены имена переменных
     //while (row != 0 || col != n - 1) {
     //    route += path[row][col];
     //    if (path[row][col] == 'D') {
@@ -192,18 +199,15 @@ int main()
     }
 
     // FIX_ME: добавить std::
-    // FIX_ME: обновлено имя переменной
     //reverse(route.begin(), route.end());
     std::reverse(Route.begin(), Route.end()); // Переворачивает строку route, чтобы получить путь от правой верхней клетки к левой нижней.
 
     // FIX_ME: добавить std::
-    // FIX_ME: обновлены имена переменных
     //outputFile << dp[n - 1][0] << endl;
     //outputFile << route << endl;
     //outputFile.close();
     OutputFile << DP[N - 1][0] << std::endl; // Записывает минимальную сумму (dp[n - 1][0]) в файл "output1.txt".
     OutputFile << Route << std::endl; // Записывает маршрут (route) в файл "output1.txt".
-
     OutputFile.close();
 
     return 0;

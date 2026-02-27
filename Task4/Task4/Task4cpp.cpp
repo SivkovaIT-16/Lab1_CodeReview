@@ -1,5 +1,7 @@
 #include "Task4.h"
 #include <string>
+// FIX_ME: добавлена библиотека
+#include <stdexcept>
 
 // FIX_ME: фигурная скобка должна быть на новой строке
 // FIX_ME: параметр должен быть константной ссылкой 
@@ -9,6 +11,11 @@
 //int Num(string s) {
 int ParseNumber(const std::string& Text)
 {
+    // FIX_ME: добавлена проверка на пустое выражение
+    if (Text.empty())
+    {
+        throw std::runtime_error("Пустое выражение");
+    }
     // FIX_ME: фигурная скобка должна быть на новой строке
     // FIX_ME: имя параметра обновлено
     //if (s[0] == '(' && s[s.length() - 1] == ')') {
@@ -22,6 +29,14 @@ int ParseNumber(const std::string& Text)
     //else {
     else
     {
+        // FIX_ME: добавлена проверка
+        for (char Ch : Text)
+        {
+            if (!std::isdigit(Ch))
+            {
+                throw std::runtime_error("Ожидалась цифра, получено: " + Text);
+            }
+        }
         // FIX_ME: имя параметра обновлено
         // FIX_ME: добавить std::
         //return stoi(s);
@@ -198,4 +213,78 @@ int CalculateExpression(const std::string& Expression)
 
 
     return 0;
+}
+
+bool HasValidCharacters(const std::string& Expression)
+{
+    for (char Ch : Expression)
+    {
+        if (!std::isdigit(Ch) && Ch != '(' && Ch != ')' &&
+            Ch != '+' && Ch != '-' && Ch != '*')
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool IsBalancedParentheses(const std::string& Expression)
+{
+    int Balance = 0;
+    for (char Ch : Expression)
+    {
+        if (Ch == '(')
+        {
+            ++Balance;
+        }
+        else if (Ch == ')')
+        {
+            --Balance;
+            if (Balance < 0)
+            {
+                return false; // Закрывающая скобка без открывающей
+            }
+        }
+    }
+    return Balance == 0; // Все скобки закрыты
+}
+
+bool IsValidExpression(const std::string& Expression)
+{
+    if (Expression.empty())
+    {
+        return false;
+    }
+
+    if (!HasValidCharacters(Expression))
+    {
+        return false;
+    }
+
+    if (!IsBalancedParentheses(Expression))
+    {
+        return false;
+    }
+    char FirstChar = Expression[0];
+    char LastChar = Expression[Expression.length() - 1];
+
+    if (FirstChar == '+' || FirstChar == '-' || FirstChar == '*' ||
+        LastChar == '+' || LastChar == '-' || LastChar == '*')
+    {
+        return false;
+    }
+
+    // Проверка на последовательность знаков (например, "++", "--", "**")
+    for (size_t i = 0; i < Expression.length() - 1; ++i)
+    {
+        char Current = Expression[i];
+        char Next = Expression[i + 1];
+        if ((Current == '+' || Current == '-' || Current == '*') &&
+            (Next == '+' || Next == '-' || Next == '*'))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }

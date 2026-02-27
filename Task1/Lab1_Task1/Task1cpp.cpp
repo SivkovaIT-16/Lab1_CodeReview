@@ -8,8 +8,8 @@
 void FindNumbers(std::vector<std::vector<int>>& Matrix, int Row, int Col, std::vector<int>& Weights)
 {
     //FIX_ME: отсутствуют фигурные скобки для if
-    //FIX_ME: параметры обновлены
     //if (Mvector[i][j] == 0)
+    //    return;
     if (Matrix[Row][Col] == 0)
     {
         return;
@@ -17,22 +17,62 @@ void FindNumbers(std::vector<std::vector<int>>& Matrix, int Row, int Col, std::v
 
     // FIX_ME: отсутствуют пробелы вокруг бинарного оператора '-'
     // FIX_ME: отсутствуют фигурные скобки для if
-    // FIX_ME: параметры обновлены
     //if (Mvector[i-1][j] == Mvector[i][j])
+    //    find_numbers(Mvector, i - 1, j, Wvector);
     if (Matrix[Row - 1][Col] == Matrix[Row][Col])
     {
-        // FIX_ME: имя функции изменено, параметры обновлены
         //find_numbers(Mvector, i - 1, j, Wvector);
         FindNumbers(Matrix, Row - 1, Col, Weights);
     }
     else
     {
-        // FIX_ME: добавлен std::cout
-        // FIX_ME: обновлён параметр
+        // FIX_ME: добавлен std::
         //cout << i << " ";
         std::cout << Row << " ";
-        // FIX_ME: имя функции изменено, параметры обновлены
+
+        // FIX_ME: исправлена логика восстановления пути (должен вычитаться вес текущего предмета)
         //find_numbers(Mvector, i - 1, j, Wvector);
-        FindNumbers(Matrix, Row - 1, Col, Weights);
+        FindNumbers(Matrix, Row - 1, Col - Weights[Row], Weights);
     }
+}
+
+// FIX_ME: добавлены новые функции для работы с файлами (отсутствовали в исходном коде)
+bool OpenFile(std::ifstream& Stream, const std::string& FileName)
+{
+    Stream.open(FileName);
+    if (!Stream.is_open())
+    {
+        std::cerr << "Ошибка: не удалось открыть файл " << FileName << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool ReadNumber(std::ifstream& Stream, int& Value)
+{
+    Stream >> Value;
+    if (Stream.fail())
+    {
+        std::cerr << "Ошибка: некорректные данные в файле" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool ReadArray(std::ifstream& Stream, std::vector<int>& Array, int Size, const std::string& ArrayName)
+{
+    for (int i = 1; i <= Size; ++i)
+    {
+        if (!ReadNumber(Stream, Array[i]))
+        {
+            std::cerr << "Ошибка: некорректное значение в " << ArrayName << " для артефакта " << i << std::endl;
+            return false;
+        }
+        if (Array[i] < 0)
+        {
+            std::cerr << "Ошибка: " << ArrayName << " артефакта " << i << " должен быть положительным" << std::endl;
+            return false;
+        }
+    }
+    return true;
 }

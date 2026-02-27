@@ -10,6 +10,8 @@
 #include "Task4.h"
 #include <iostream>
 #include <string>
+// FIX_ME: добавлена библиотека
+#include <stdexcept>
 
 // FIX_ME: using namespace std в глобальной области видимости
 // using namespace std;
@@ -30,6 +32,20 @@ int main()
     //cout << "Результат: " << Calc(s) << endl;
     std::cout << "Введите строку вида - <цифра> | (<выражение><знак><выражение>), где знак - (+ | - | *):" << std::endl;
     std::cin >> Expression;
-    std::cout << "Результат: " << CalculateExpression(Expression) << std::endl;
+    // FIX_ME: добавлен выброс исключения
+    try
+    {
+        if (!IsValidExpression(Expression))
+        {
+            std::cerr << "Ошибка: выражение содержит недопустимые символы или имеет некорректный формат." << std::endl;
+            return 1;
+        }
+        std::cout << "Результат: " << CalculateExpression(Expression) << std::endl;
+    }
+    catch (const std::exception& Error)
+    {
+        std::cerr << "Ошибка вычисления: " << Error.what() << std::endl;
+        return 1;
+    }
     return 0;
 }

@@ -12,63 +12,69 @@
 #include <fstream>
 #include <string>
 #include <vector>
+// FIX_ME: добавлена библиотека
+#include <limits>
 
 // FIX_ME: using namespace std в глобальной области видимости
 //using namespace std;
 
 int main()
 {
+    // FIX_ME: добавлена поддержка русского языка
+    setlocale(LC_ALL,"Russian");
+
     // FIX_ME: переменные должны быть инициализированы при объявлении
     // FIX_ME: имена переменных должны начинаться с большой буквы и не должны содержать нижжних подчёркиваний
     //int n, b, k, weight, volume, ind_i, ind_j;
-    int N = 0, B = 0, K = 0, Weight = 0, Volume = 0, IndexI = 0, IndexJ = 0;
+    int N = 0, B = 0, Weight = 0, Volume = 0, IndexI = 0, IndexJ = 0;
 
     // FIX_ME: добавить std::
     // FIX_ME: имя переменной должно начинаться с большой буквы
     //ifstream stream;
     std::ifstream Stream;
 
-    // FIX_ME: обновлены имена переменных
+    // FIX_ME: добавлена проверка открытия файла
     //stream.open("a.txt");
-    //stream >> n;
-    //stream >> b;
-    Stream.open("a.txt");
-    Stream >> N;
-    Stream >> B;
+    if (!OpenFile(Stream, "a.txt"))
+    {
+        return 1;
+    }
 
+    // FIX_ME: добавлена проверка корректности N
+    //stream >> n;
+    if (!ReadNumber(Stream, N) || N <= 0 || N >= 20)
+    {
+        std::cerr << "Ошибка: N должно быть положительным числом" << std::endl;
+        return 1;
+    }
+
+    // FIX_ME: добавлена проверка корректности B
+    //stream >> b;
+    if (!ReadNumber(Stream, B) || B <= 0)
+    {
+        std::cerr << "Ошибка: B должно быть положительным числом" << std::endl;
+        return 1;
+    }
+
+    // FIX_ME: добавлена инициализация векторов при объявлении
     // FIX_ME: добавить std::
-    //FIX_ME: обновлено имя переменной
     // FIX_ME: отсутствуют пробелы вокруг бинарного оператора '+'
     // FIX_ME: имя переменной должно начинаться с заглавной буквы и не должно содержать нижних подчёркиваний
     //vector <int> weight_vector(n+1);
-    std::vector<int> Weights(N + 1);
-
-    // FIX_ME: отсутствуют фигурные скобки для for
-    // FIX_ME: использовать префиксный инкремент
-    // FIX_ME: обновлены имена переменных
-    //for (int i = 1; i <= n; i++)
-    //    stream >> weight_vector[i];
-    for (int i = 1; i <= N; ++i)
+    //vector <int> volume_vector(n + 1);
+    std::vector<int> Weights(N + 1, 0);
+    if (!ReadArray(Stream, Weights, N, "вес"))
     {
-        Stream >> Weights[i];
+        return 1;
+    }
+    std::vector<int> Volumes(N + 1, 0);
+    if (!ReadArray(Stream, Volumes, N, "объём"))
+    {
+        return 1;
     }
 
-    // FIX_ME: добавить std::
-    //FIX_ME: обновлено имя переменной
-    // FIX_ME: отсутствуют пробелы вокруг бинарного оператора '+'
-    // FIX_ME: имя переменной должно начинаться с заглавной буквы и не должно содержать нижних подчёркиваний
-    //vector <int> volume_vector(n+1);
-    std::vector<int> Volumes(N + 1);
-
-    // FIX_ME: отсутствуют фигурные скобки для for
-    // FIX_ME: использовать префиксный инкремент
-    // FIX_ME: обновлены имена переменных
-    //for (int i = 1; i <= n; i++)
-    //    stream >> volume_vector[i];
-    for (int i = 1; i <= N; ++i)
-    {
-        Stream >> Volumes[i];
-    }
+    // FIX_ME: добавлено закрытие файла
+    Stream.close();
 
     // FIX_ME: добавить std::
     // FIX_ME: имена переменных должны быть информативными, начинаться с заглавной буквы и не должны содержать нижних подчёркиваний
@@ -78,108 +84,72 @@ int main()
     //vector <vector <int>> sum_volume_vector(n+1, vector <int>(b+1, 0));
     std::vector<std::vector<int>> WeightMatrix(N + 1, std::vector<int>(B + 1, 0));
     std::vector<std::vector<int>> VolumeMatrix(N + 1, std::vector<int>(B + 1, 0));
+    // FIX_ME: добавлена матрица для отслеживания количества предметов
+    std::vector<std::vector<int>> CountMatrix(N + 1, std::vector<int>(B + 1, 0));
 
     // FIX_ME: использовать префиксный инкремент
-    //FIX_ME: обновлено имя переменной
     //for (int i = 1; i <= n; i++)
     for (int i = 1; i <= N; ++i)
     {
-        // FIX_ME: использовать префиксный инкремент
-        //FIX_ME: обновлено имя переменной
-        //for (int j = 1; j <= b; j++)
         for (int j = 1; j <= B; ++j)
         {
-            //FIX_ME: обновлено имя переменной
-            //if (j >= weight_vector[i])
+            // FIX_ME: исправлена логика алгоритма
+            WeightMatrix[i][j] = WeightMatrix[i - 1][j];
+            VolumeMatrix[i][j] = VolumeMatrix[i - 1][j];
+            CountMatrix[i][j] = CountMatrix[i - 1][j];
+
             if (j >= Weights[i])
             {
-                // FIX_ME: отсутствуют пробелы вокруг бинарного оператора '-'
-                // FIX_ME: обновлены имена переменных
-                //main_vector[i][j] = main_vector[i-1][j] + weight_vector[i];
-                //sum_volume_vector[i][j] = sum_volume_vector[i-1][j] + volume_vector[i];
-                WeightMatrix[i][j] = WeightMatrix[i - 1][j] + Weights[i];
-                VolumeMatrix[i][j] = VolumeMatrix[i - 1][j] + Volumes[i];
-            }
-            else
-            {
-                // FIX_ME: отсутствуют пробелы вокруг бинарного оператора '-'
-                // FIX_ME: обновлены имена переменных
-                //main_vector[i][j] = main_vector[i-1][j];
-                //sum_volume_vector[i][j] = sum_volume_vector[i-1][j];
-                WeightMatrix[i][j] = WeightMatrix[i - 1][j];
-                VolumeMatrix[i][j] = VolumeMatrix[i - 1][j];
+                int NewWeight = WeightMatrix[i - 1][j - Weights[i]] + Weights[i];
+                int NewVolume = VolumeMatrix[i - 1][j - Weights[i]] + Volumes[i];
+                int NewCount = CountMatrix[i - 1][j - Weights[i]] + 1;
+
+                // FIX_ME: добавлено сравнение по приоритетам:
+                // 1. Больше количество предметов
+                // 2. Вес ближе к B
+                if (NewCount > CountMatrix[i][j] ||
+                    (NewCount == CountMatrix[i][j] &&
+                        abs(B - NewWeight) < abs(B - WeightMatrix[i][j])))
+                {
+                    WeightMatrix[i][j] = NewWeight;
+                    VolumeMatrix[i][j] = NewVolume;
+                    CountMatrix[i][j] = NewCount;
+                }
             }
         }
     }
-    // FIX_ME: обновлены имена переменных
-    //k = b;
-    K = B;
 
-    //FIX_ME: булевы переменные должны начинаться с префикса 'b'
-    //bool flag = true;
-    bool bFlag = true;
+    // FIX_ME: улучшен поиск оптимального решения
+    int BestWeight = 0;
+    int BestVolume = 0;
+    int BestCount = 0;
 
-    // FIX_ME: избыточное сравнение с true
-    // FIX_ME: использовать префиксный инкремент
-    // FIX_ME: обновлены имена переменных
-    //while (flag == true && k >= 1)
-    //{
-    //    for (int i = n; i >= 1; i--)
-    //    {
-    //        for (int j = b; j >= 1; j--)
-    //        {
-    //            if (main_vector[i][j] == k)
-    //            {
-    //                ind_i = i; ind_j = j;
-    //                weight = main_vector[i][j];
-    //                volume = sum_volume_vector[i][j];
-    //                flag = false;
-    //            }
-    while (bFlag && K >= 1)
+    for (int j = B; j >= 0; --j)
     {
-        for (int i = N; i >= 1; --i)
+        if (CountMatrix[N][j] > BestCount ||
+            (CountMatrix[N][j] == BestCount && WeightMatrix[N][j] > BestWeight))
         {
-            for (int j = B; j >= 1; --j)
-            {
-                if (WeightMatrix[i][j] == K)
-                {
-
-                    IndexI = i;
-                    IndexJ = j;
-                    Weight = WeightMatrix[i][j];
-                    Volume = VolumeMatrix[i][j];
-                    bFlag = false;
-                }
-                // FIX_ME: избыточное сравнение с false
-                //FIX_ME: обновлено имя переменной
-                // FIX_ME: отсутствуют фигурные скобки для if
-                //if (flag == false)
-                if (!bFlag)
-                {
-                    break;
-                }
-            }
-            // FIX_ME: избыточное сравнение с false
-            //FIX_ME: обновлено имя переменной
-            // FIX_ME: отсутствуют фигурные скобки для if
-            //if (flag == false)
-            if (!bFlag)
-            {
-                break;
-            }
+            BestCount = CountMatrix[N][j];
+            BestWeight = WeightMatrix[N][j];
+            BestVolume = VolumeMatrix[N][j];
+            IndexI = N;
+            IndexJ = j;
         }
-        // FIX_ME: использовать префиксный декремент
-        //FIX_ME: обновлено имя переменной
-        //k--;
-        --K;
     }
-    // FIX_ME: обновлены имена переменных
-    // FIX_ME: добавить std::cout
+
+    // FIX_ME: добавлена проверка, что решение найдено
+    if (BestWeight == 0)
+    {
+        std::cerr << "Ошибка: не удалось найти подходящее подмножество" << std::endl;
+        return 1;
+    }
+
+    // FIX_ME: добавить std::
     //cout << "weight: " << weight << " volume: " << volume << endl;
     //cout << "artifact numbers: ";
-    std::cout << "weight: " << Weight << " volume: " << Volume << std::endl;
+    std::cout << "weight: " << BestWeight << " volume: " << BestVolume << std::endl;
     std::cout << "artifact numbers: ";
-    // FIX_ME: имя функции изменено, параметры обновлены
+
     //find_numbers(main_vector, ind_i, ind_j, weight_vector);
     FindNumbers(WeightMatrix, IndexI, IndexJ, Weights);
 }
