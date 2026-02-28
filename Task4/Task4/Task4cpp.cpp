@@ -3,12 +3,6 @@
 // FIX_ME: добавлена библиотека
 #include <stdexcept>
 
-// FIX_ME: фигурная скобка должна быть на новой строке
-// FIX_ME: параметр должен быть константной ссылкой 
-// FIX_ME: имя функции должно быть информативным 
-// FIX_ME: имя параметра должно начинаться с заглавной буквы и быть информативным
-// FIX_ME: добавить std::
-//int Num(string s) {
 int ParseNumber(const std::string& Text)
 {
     // FIX_ME: добавлена проверка на пустое выражение
@@ -17,11 +11,9 @@ int ParseNumber(const std::string& Text)
         throw std::runtime_error("Пустое выражение");
     }
     // FIX_ME: фигурная скобка должна быть на новой строке
-    // FIX_ME: имя параметра обновлено
     //if (s[0] == '(' && s[s.length() - 1] == ')') {
     if (Text[0] == '(' && Text[Text.length() - 1] == ')')
     {
-        // FIX_ME: имя параметра обновлено
         //return Calc(s.substr(1, s.length() - 2));
         return CalculateExpression(Text.substr(1, Text.length() - 2));
     }
@@ -30,261 +22,111 @@ int ParseNumber(const std::string& Text)
     else
     {
         // FIX_ME: добавлена проверка
-        for (char Ch : Text)
+        if (Text.length() == 1)
         {
-            if (!std::isdigit(Ch))
+            if (!std::isdigit(Text[0]))
             {
                 throw std::runtime_error("Ожидалась цифра, получено: " + Text);
             }
+            return std::stoi(Text);
         }
-        // FIX_ME: имя параметра обновлено
-        // FIX_ME: добавить std::
-        //return stoi(s);
-        return std::stoi(Text);
+        else
+        {
+            if (!std::isdigit(Text[0]))
+            {
+                throw std::runtime_error("Ожидалась цифра, получено: " + Text);
+            }
+            // FIX_ME: рекурсивный вызов для проверки остальных символов
+            return ParseNumber(Text.substr(1));
+        }
     }
 }
 
-// FIX_ME: фигурная скобка должна быть на новой строке
-// FIX_ME: параметр должен быть константной ссылкой
-// FIX_ME: имя функции должно быть информативным 
-// FIX_ME: имя параметра должно начинаться с заглавной буквы и быть информативным
-// FIX_ME: добавить std::
-//int Term(string s) {
-int ParseTerm(const std::string& Text)
+// FIX_ME: удалены все циклы, используется рекурсия
+int ParseTerm(const std::string& Text, int Index, int Level)
 {
-    // FIX_ME: имена переменных должны быть информативными и начинаться с заглавной буквы
-    //int i = s.length() - 1;
-    //int level = 0;
-    //int pos = -1;
-    int Index = Text.length() - 1;
-    int Level = 0;
-    int OperatorPosition = -1;
-
-    // FIX_ME: имя переменной обновлено
-    // FIX_ME: фигурная скобка должна быть на новой строке
-    //while (i >= 0) {
-    while (Index >= 0)
-    {
-        // FIX_ME: имена переменных и имя параметра обновлены
-        // FIX_ME: фигурная скобка должна быть на новой строке
-        // FIX_ME: использовать префиксный инкремент
-        //if (s[i] == ')') {
-        //    level++;
-        //}
-        if (Text[Index] == ')')
-        {
-            ++Level;
-        }
-        // FIX_ME: имена переменных и имя параметра обновлены
-        // FIX_ME: фигурная скобка должна быть на новой строке
-        // FIX_ME: использовать префиксный декремент
-        //else if (s[i] == '(') {
-        //    level--;
-        //}
-        else if (Text[Index] == '(')
-        {
-            --Level;
-        }
-        // FIX_ME: имена переменных и имя параметра обновлены
-        // FIX_ME: фигурная скобка должна быть на новой строке
-        // FIX_ME: использовать префиксный декремент
-        //else if (level == 0 && s[i] == '*') {
-        //    pos = i;
-        //    break;
-        //}
-        //i--;
-        else if (Level == 0 && Text[Index] == '*')
-        {
-            OperatorPosition = Index;
-            break;
-        }
-        --Index;
-    }
-    // FIX_ME: имена переменных, имя параметра и имена функций обновлены
-    // FIX_ME: фигурная скобка должна быть на новой строке
-    //if (pos == -1) {
-    //    return Num(s);
-    //}
-    //return Term(s.substr(0, pos)) * Num(s.substr(pos + 1));
-    if (OperatorPosition == -1)
+    // FIX_ME: базовый случай рекурсии
+    if (Index < 0)
     {
         return ParseNumber(Text);
     }
-    return ParseTerm(Text.substr(0, OperatorPosition)) *
-        ParseNumber(Text.substr(OperatorPosition + 1));
+
+    // FIX_ME: рекурсивный обход строки справа налево
+    if (Text[Index] == ')')
+    {
+        return ParseTerm(Text, Index - 1, Level + 1);
+    }
+    else if (Text[Index] == '(')
+    {
+        return ParseTerm(Text, Index - 1, Level - 1);
+    }
+    else if (Level == 0 && Text[Index] == '*')
+    {
+        // FIX_ME: найден оператор умножения
+        return ParseTerm(Text.substr(0, Index), Index - 1, 0) *
+            ParseNumber(Text.substr(Index + 1));
+    }
+    else if (Level == 0 && (Text[Index] == '+' || Text[Index] == '-'))
+    {
+        // FIX_ME: найден оператор сложения или вычитания
+        char Op = Text[Index];
+        if (Op == '+')
+        {
+            return CalculateExpression(Text.substr(0, Index)) +
+                ParseTerm(Text.substr(Index + 1), Text.substr(Index + 1).length() - 1, 0);
+        }
+        else
+        {
+            return CalculateExpression(Text.substr(0, Index)) -
+                ParseTerm(Text.substr(Index + 1), Text.substr(Index + 1).length() - 1, 0);
+        }
+    }
+    else
+    {
+        // FIX_ME: продолжаем движение влево
+        return ParseTerm(Text, Index - 1, Level);
+    }
 }
 
-// FIX_ME: фигурная скобка должна быть на новой строке
-// FIX_ME: параметр должен быть константной ссылкой
-// FIX_ME: имя функции должно быть информативным
-// FIX_ME: имя параметра должно начинаться с заглавной буквы и быть информативным
-// FIX_ME: добавить std::
-//int Calc(string s) {
+// FIX_ME: рекурсивная функция без циклов
 int CalculateExpression(const std::string& Expression)
 {
-    // FIX_ME: имена переменных должны быть информативными и начинаться с заглавной буквы
-    // FIX_ME: имя параметра обновлено
-    //int i = s.length() - 1;
-    //int level = 0;
-    //int pos = -1;
-    int Index = Expression.length() - 1;
-    int Level = 0;
-    int OperatorPosition = -1;
-
-    // FIX_ME: имя переменной обновлено
-    // FIX_ME: фигурная скобка должна быть на новой строке
-    //while (i >= 0) {
-    while (Index >= 0)
-    {
-        // FIX_ME: имена переменных и имя параметра обновлены
-        // FIX_ME: фигурная скобка должна быть на новой строке
-        // FIX_ME: использовать префиксный инкремент
-        //if (s[i] == ')') {
-        //    level++;
-        //}
-        if (Expression[Index] == ')')
-        {
-            ++Level;
-        }
-        // FIX_ME: имена переменных и имя параметра обновлены
-        // FIX_ME: фигурная скобка должна быть на новой строке
-        // FIX_ME: использовать префиксный декремент
-        //else if (s[i] == '(') {
-        //    level--;
-        //}
-        else if (Expression[Index] == '(')
-        {
-            --Level;
-        }
-        // FIX_ME: имена переменных и имя параметра обновлены
-        // FIX_ME: фигурная скобка должна быть на новой строке
-        // FIX_ME: использовать префиксный декремент
-        //else if (level == 0 && (s[i] == '+' || s[i] == '-')) {
-        //    pos = i;
-        //    break;
-        //}
-        //i--;
-        else if (Level == 0 && (Expression[Index] == '+' || Expression[Index] == '-'))
-        {
-            OperatorPosition = Index;
-            break;
-        }
-        --Index;
-
-    }
-
-    // FIX_ME: имя переменной, имя параметра и имя функции обновлены
-    // FIX_ME: фигурная скобка должна быть на новой строке
-    //if (pos == -1) {
-    //    return Term(s);
-    //}
-    if (OperatorPosition == -1)
-    {
-        // FIX_ME: имя функции изменено
-        return ParseTerm(Expression);
-    }
-
-    // FIX_ME: имя переменной должно быть информативным и начинаться с заглавной буквы
-    // // FIX_ME: имя переменной и имя параметра обновлены
-    //char op = s[pos];
-    char Operator = Expression[OperatorPosition];
-
-    // FIX_ME: имя переменной, имя параметра и имена функций обновлены
-    // FIX_ME: фигурная скобка должна быть на новой строке
-    //if (op == '+') {
-    //    return Calc(s.substr(0, pos)) + Term(s.substr(pos + 1));
-    //}
-    if (Operator == '+')
-    {
-        return CalculateExpression(Expression.substr(0, OperatorPosition)) +
-            ParseTerm(Expression.substr(OperatorPosition + 1));
-    }
-
-    // FIX_ME: имя переменной, имя параметра и имена функций обновлены
-    // FIX_ME: фигурная скобка должна быть на новой строке
-    //if (op == '-') {
-    //    return Calc(s.substr(0, pos)) - Term(s.substr(pos + 1));
-    //}
-    if (Operator == '-')
-    {
-        return CalculateExpression(Expression.substr(0, OperatorPosition)) -
-            ParseTerm(Expression.substr(OperatorPosition + 1));
-    }
-
-
-    return 0;
+    return ParseTerm(Expression, Expression.length() - 1, 0);
 }
 
-bool HasValidCharacters(const std::string& Expression)
+bool CheckExpression(const std::string& Expression, int& Index, int& Balance)
 {
-    for (char Ch : Expression)
+    // FIX_ME: базовый случай - достигнут конец строки
+    if (Index >= static_cast<int>(Expression.length()))
     {
-        if (!std::isdigit(Ch) && Ch != '(' && Ch != ')' &&
-            Ch != '+' && Ch != '-' && Ch != '*')
-        {
-            return false;
-        }
+        return Balance == 0;
     }
-    return true;
+
+    char Ch = Expression[Index];
+    Index++;
+
+    // FIX_ME: проверка допустимых символов
+    if (!std::isdigit(Ch) && Ch != '(' && Ch != ')' &&
+        Ch != '+' && Ch != '-' && Ch != '*')
+    {
+        return false;
+    }
+
+    // FIX_ME: проверка баланса скобок
+    if (Ch == '(') Balance++;
+    if (Ch == ')') Balance--;
+    if (Balance < 0) return false;
+
+    // FIX_ME: рекурсивный вызов для следующего символа
+    return CheckExpression(Expression, Index, Balance);
 }
 
-bool IsBalancedParentheses(const std::string& Expression)
-{
-    int Balance = 0;
-    for (char Ch : Expression)
-    {
-        if (Ch == '(')
-        {
-            ++Balance;
-        }
-        else if (Ch == ')')
-        {
-            --Balance;
-            if (Balance < 0)
-            {
-                return false; // Закрывающая скобка без открывающей
-            }
-        }
-    }
-    return Balance == 0; // Все скобки закрыты
-}
-
+// FIX_ME: добавлена функция проверки валидности выражения
 bool IsValidExpression(const std::string& Expression)
 {
-    if (Expression.empty())
-    {
-        return false;
-    }
+    if (Expression.empty()) return false;
 
-    if (!HasValidCharacters(Expression))
-    {
-        return false;
-    }
-
-    if (!IsBalancedParentheses(Expression))
-    {
-        return false;
-    }
-    char FirstChar = Expression[0];
-    char LastChar = Expression[Expression.length() - 1];
-
-    if (FirstChar == '+' || FirstChar == '-' || FirstChar == '*' ||
-        LastChar == '+' || LastChar == '-' || LastChar == '*')
-    {
-        return false;
-    }
-
-    // Проверка на последовательность знаков (например, "++", "--", "**")
-    for (size_t i = 0; i < Expression.length() - 1; ++i)
-    {
-        char Current = Expression[i];
-        char Next = Expression[i + 1];
-        if ((Current == '+' || Current == '-' || Current == '*') &&
-            (Next == '+' || Next == '-' || Next == '*'))
-        {
-            return false;
-        }
-    }
-
-    return true;
+    int Index = 0;
+    int Balance = 0;
+    return CheckExpression(Expression, Index, Balance);
 }
