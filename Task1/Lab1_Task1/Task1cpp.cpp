@@ -1,13 +1,13 @@
 #include "Task1.h"
 #include <iostream>
 
-// FIX_ME: РёРјСЏ С„СѓРЅРєС†РёРё РґРѕР»Р¶РЅРѕ РЅР°С‡РёРЅР°С‚СЊСЃСЏ СЃ Р·Р°РіР»Р°РІРЅРѕР№ Р±СѓРєРІС‹ Рё РЅРµ РґРѕР»Р¶РЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ РЅРёР¶РЅРёС… РїРѕРґС‡С‘СЂРєРёРІР°РЅРёР№
-// FIX_ME: РїР°СЂР°РјРµС‚СЂС‹ РґРѕР»Р¶РЅС‹ РЅР°С‡РёРЅР°С‚СЊСЃСЏ СЃ Р·Р°РіР»Р°РІРЅРѕР№ Р±СѓРєРІС‹ Рё Р±С‹С‚СЊ РёРЅС„РѕСЂРјР°С‚РёРІРЅС‹РјРё
-// FIX_ME: Р»РёС€РЅРёРµ РїСЂРѕР±РµР»С‹ РІ СѓРіР»РѕРІС‹С… СЃРєРѕР±РєР°С…
+// FIX_ME: имя функции должно начинаться с заглавной буквы и не должно содержать нижних подчёркиваний
+// FIX_ME: параметры должны начинаться с заглавной буквы и быть информативными
+// FIX_ME: лишние пробелы в угловых скобках
 //void find_numbers(vector <vector <int>> &Mvector, int i, int j, vector <int> &Wvector)
 void FindNumbers(std::vector<std::vector<int>>& Matrix, int Row, int Col, std::vector<int>& Weights)
 {
-    //FIX_ME: РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ С„РёРіСѓСЂРЅС‹Рµ СЃРєРѕР±РєРё РґР»СЏ if
+    //FIX_ME: отсутствуют фигурные скобки для if
     //if (Mvector[i][j] == 0)
     //    return;
     if (Matrix[Row][Col] == 0)
@@ -15,8 +15,8 @@ void FindNumbers(std::vector<std::vector<int>>& Matrix, int Row, int Col, std::v
         return;
     }
 
-    // FIX_ME: РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ РїСЂРѕР±РµР»С‹ РІРѕРєСЂСѓРі Р±РёРЅР°СЂРЅРѕРіРѕ РѕРїРµСЂР°С‚РѕСЂР° '-'
-    // FIX_ME: РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ С„РёРіСѓСЂРЅС‹Рµ СЃРєРѕР±РєРё РґР»СЏ if
+    // FIX_ME: отсутствуют пробелы вокруг бинарного оператора '-'
+    // FIX_ME: отсутствуют фигурные скобки для if
     //if (Mvector[i-1][j] == Mvector[i][j])
     //    find_numbers(Mvector, i - 1, j, Wvector);
     if (Matrix[Row - 1][Col] == Matrix[Row][Col])
@@ -26,23 +26,23 @@ void FindNumbers(std::vector<std::vector<int>>& Matrix, int Row, int Col, std::v
     }
     else
     {
-        // FIX_ME: РґРѕР±Р°РІР»РµРЅ std::
+        // FIX_ME: добавлен std::
         //cout << i << " ";
         std::cout << Row << " ";
 
-        // FIX_ME: РёСЃРїСЂР°РІР»РµРЅР° Р»РѕРіРёРєР° РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РїСѓС‚Рё (РґРѕР»Р¶РµРЅ РІС‹С‡РёС‚Р°С‚СЊСЃСЏ РІРµСЃ С‚РµРєСѓС‰РµРіРѕ РїСЂРµРґРјРµС‚Р°)
+        // FIX_ME: исправлена логика восстановления пути (должен вычитаться вес текущего предмета)
         //find_numbers(Mvector, i - 1, j, Wvector);
         FindNumbers(Matrix, Row - 1, Col - Weights[Row], Weights);
     }
 }
 
-// FIX_ME: РґРѕР±Р°РІР»РµРЅС‹ РЅРѕРІС‹Рµ С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»Р°РјРё (РѕС‚СЃСѓС‚СЃС‚РІРѕРІР°Р»Рё РІ РёСЃС…РѕРґРЅРѕРј РєРѕРґРµ)
+// FIX_ME: добавлены новые функции для работы с файлами (отсутствовали в исходном коде)
 bool OpenFile(std::ifstream& Stream, const std::string& FileName)
 {
     Stream.open(FileName);
     if (!Stream.is_open())
     {
-        std::cerr << "РћС€РёР±РєР°: РЅРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» " << FileName << std::endl;
+        std::cerr << "Ошибка: не удалось открыть файл " << FileName << std::endl;
         return false;
     }
     return true;
@@ -53,7 +53,7 @@ bool ReadNumber(std::ifstream& Stream, int& Value)
     Stream >> Value;
     if (Stream.fail())
     {
-        std::cerr << "РћС€РёР±РєР°: РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РґР°РЅРЅС‹Рµ РІ С„Р°Р№Р»Рµ" << std::endl;
+        std::cerr << "Ошибка: некорректные данные в файле" << std::endl;
         return false;
     }
     return true;
@@ -65,12 +65,12 @@ bool ReadArray(std::ifstream& Stream, std::vector<int>& Array, int Size, const s
     {
         if (!ReadNumber(Stream, Array[i]))
         {
-            std::cerr << "РћС€РёР±РєР°: РЅРµРєРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РІ " << ArrayName << " РґР»СЏ Р°СЂС‚РµС„Р°РєС‚Р° " << i << std::endl;
+            std::cerr << "Ошибка: некорректное значение в " << ArrayName << " для артефакта " << i << std::endl;
             return false;
         }
         if (Array[i] < 0)
         {
-            std::cerr << "РћС€РёР±РєР°: " << ArrayName << " Р°СЂС‚РµС„Р°РєС‚Р° " << i << " РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РїРѕР»РѕР¶РёС‚РµР»СЊРЅС‹Рј" << std::endl;
+            std::cerr << "Ошибка: " << ArrayName << " артефакта " << i << " должен быть положительным" << std::endl;
             return false;
         }
     }
